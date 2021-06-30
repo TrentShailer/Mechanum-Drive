@@ -9,17 +9,43 @@
 // ---- END VEXCODE CONFIGURED DEVICES ----
 
 #include "vex.h"
+#include "Mechanum.h"
 
 using namespace vex;
 
 competition Competition;
 
+MechanumDrivetrain mechanumDrivetrain = MechanumDrivetrain(220);
+
 void pre_auton(void) { vexcodeInit(); }
 
-void autonomous(void) {}
+void autonomous(void) {
+  mechanumDrivetrain.DriveFor(600, MechanumDrivetrain::travelDirection::north, 25);
+  wait(1000, msec);
+  mechanumDrivetrain.DriveFor(600, MechanumDrivetrain::travelDirection::northEast, 25);
+  wait(1000, msec);
+  mechanumDrivetrain.DriveFor(600, MechanumDrivetrain::travelDirection::east, 25);
+  wait(1000, msec);
+  mechanumDrivetrain.DriveFor(600, MechanumDrivetrain::travelDirection::southEast, 25);
+  wait(1000, msec);
+  mechanumDrivetrain.DriveFor(600, MechanumDrivetrain::travelDirection::south, 25);
+  wait(1000, msec);
+  mechanumDrivetrain.DriveFor(600, MechanumDrivetrain::travelDirection::southWest, 25);
+  wait(1000, msec);
+  mechanumDrivetrain.DriveFor(600, MechanumDrivetrain::travelDirection::west, 25);
+  wait(1000, msec);
+  mechanumDrivetrain.DriveFor(600, MechanumDrivetrain::travelDirection::northWest, 25);
+  wait(1000, msec);
+
+  mechanumDrivetrain.TurnFor(90, MechanumDrivetrain::turnDirection::left, 15);
+  wait(1000, msec);
+  mechanumDrivetrain.TurnFor(180, MechanumDrivetrain::turnDirection::right, 15);
+  wait(1000, msec);
+}
 
 void usercontrol(void) {
   while (1) {
+    mechanumDrivetrain.ManualControl();
     wait(20, msec);
   }
 }
