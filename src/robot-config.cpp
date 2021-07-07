@@ -13,6 +13,12 @@ motor Motor_FL = motor(PORT1, ratio18_1, false);
 motor Motor_BL = motor(PORT11, ratio18_1, false);
 motor Motor_BR = motor(PORT20, ratio18_1, true);
 controller Controller1 = controller(primary);
+motor MotorSelector = motor(PORT15, ratio18_1, false);
+motor MotorTightener = motor(PORT16, ratio18_1, false);
+/*vex-vision-config:begin*/
+vision Vision = vision (PORT2, 50);
+/*vex-vision-config:end*/
+limit LimitSwitch = limit(Brain.ThreeWirePort.A);
 
 // VEXcode generated functions
 // define variable for remote controller enable/disable

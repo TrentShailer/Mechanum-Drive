@@ -1,6 +1,8 @@
 #ifndef util_H
 #define util_H
 
+#include "vex.h"
+
 enum side
 {
 	left,
@@ -8,12 +10,20 @@ enum side
 	none
 };
 
-void ResetToggle(void *arg)
+enum TowerColour{
+  red,
+  blue,
+  yellow
+};
+
+
+int ResetToggle(void *arg)
 {
 	bool *canChange = (bool *)arg;
 	*canChange = false;
 	vex::this_thread::sleep_for(500);
 	*canChange = true;
+  return 1;
 }
 
 bool floatWithin(float n, float min, float max)
