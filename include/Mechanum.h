@@ -36,7 +36,8 @@ public:
 
   enum turnDirection { left, right };
 
-  void DriveFor(int distance_MM, MechanumDrivetrain::travelDirection dir, int speed) {
+  void DriveFor(int distance_MM, MechanumDrivetrain::travelDirection dir,
+                int speed) {
     float deg = distance_MM / 0.88663;
     float fr_deg = 0, fl_deg = 0, br_deg = 0, bl_deg = 0;
     switch (dir) {
@@ -81,7 +82,8 @@ public:
                      true);
   }
 
-  void TurnFor(int angle_deg, MechanumDrivetrain::turnDirection dir, int speed) {
+  void TurnFor(int angle_deg, MechanumDrivetrain::turnDirection dir,
+               int speed) {
     float wheel_deg = (robotRadius * angle_deg) / 101.6;
     float left = dir == turnDirection::left ? -wheel_deg : wheel_deg;
     float right = dir == turnDirection::left ? wheel_deg : -wheel_deg;
@@ -96,21 +98,33 @@ public:
                      velocityUnits::pct, true);
   }
 
-  void ManualControl() {
-    int forwardVal = Controller1.Axis3.position(vex::percent);
-    int sidewaysVal = Controller1.Axis4.position(vex::percent);
+  void ManualControl(ArmDirections selectedDir) {
+    int forwardVal = 0;
+    int sidewaysVal = 0;
+    if (selectedDir == 0) {
+      forwardVal = Controller1.Axis3.position(vex::percent);
+      sidewaysVal = Controller1.Axis4.position(vex::percent);
+    } else if (selectedDir == 180) {
+      forwardVal = -Controller1.Axis3.position(vex::percent);
+      sidewaysVal = -Controller1.Axis4.position(vex::percent);
+    } else if (selectedDir == 90) {
+      forwardVal = Controller1.Axis4.position(vex::percent);
+      sidewaysVal = Controller1.Axis3.position(vex::percent);
+    } else {
+      forwardVal = -Controller1.Axis4.position(vex::percent);
+      sidewaysVal = -Controller1.Axis3.position(vex::percent);
+    }
     int turnVal = Controller1.Axis1.position(vex::percent) / 4;
 
-    if(floatWithin(forwardVal, -15, 15)){
+    if (floatWithin(forwardVal, -15, 15)) {
       forwardVal = 0;
     }
-    if(floatWithin(sidewaysVal, -15, 15)){
+    if (floatWithin(sidewaysVal, -15, 15)) {
       sidewaysVal = 0;
     }
-    if(floatWithin(turnVal, -15, 15)){
+    if (floatWithin(turnVal, -15, 15)) {
       turnVal = 0;
     }
-    
 
     float fr_target = forwardVal + sidewaysVal - turnVal;
     float fl_target = forwardVal - sidewaysVal + turnVal;

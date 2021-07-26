@@ -3,17 +3,11 @@
 
 #include "vex.h"
 
-enum side
-{
-	left,
-	right,
-	none
-};
-
-enum TowerColour{
-  red,
-  blue,
-  yellow
+enum ArmDirections {
+  north = 0,
+  east = 90,
+  south = 180,
+  west = -90,
 };
 
 

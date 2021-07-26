@@ -5,20 +5,11 @@
 #include <vex_task.h>
 
 using namespace vex;
+using travelDirection = MechanumDrivetrain::travelDirection;
 
 competition Competition;
 
 MechanumDrivetrain mechanumDrivetrain = MechanumDrivetrain(220);
-
-side selectedSide = side::none;
-TowerColour selectedTeam = TowerColour::red;
-
-enum ArmDirections {
-  north = 0,
-  east = 90,
-  south = 180,
-  west = -90,
-};
 
 ArmDirections currentArm = north;
 bool canSelect = true;
@@ -49,20 +40,24 @@ int sizeTolorance = 10;
 int targetWidth = 50;
 int targetHeight = 30;
 
-MechanumDrivetrain::travelDirection
-GetDirection(MechanumDrivetrain::travelDirection relativeDirection,
+travelDirection
+GetDirection(travelDirection relativeDirection,
              ArmDirections globalDirection) {
 
   int newDir = globalDirection + relativeDirection;
   if (newDir == -180)
     newDir = 180;
 
-  return (MechanumDrivetrain::travelDirection)(newDir);
+  return (travelDirection)(newDir);
 }
 
-void PickupTower(TowerColour towerColour) {
+void PickupTower(std::string towerColour) {
+  int sig = 2;
+  if(towerColour == "Red") sig=0;
+  else if(towerColour == "Blue") sig = 1;
+  else if(towerColour == "Yellow") sig = 2;
   // Select signature based off tower colour
-  Vision.takeSnapshot(towerColour); // R0, B1, Y2
+  Vision.takeSnapshot(sig); // R0, B1, Y2
   bool inPlace = false;
   // If tower found
   if (Vision.objectCount > 0) {
@@ -70,7 +65,7 @@ void PickupTower(TowerColour towerColour) {
     while (!inPlace) {
       bool moved = false;
       // Take photo
-      Vision.takeSnapshot(towerColour);
+      Vision.takeSnapshot(sig);
       VexVisionObject obj = Vision.largestObject;
 
       // Center bot on tower
@@ -78,13 +73,13 @@ void PickupTower(TowerColour towerColour) {
         moved = true;
         // move left
         mechanumDrivetrain.DriveFor(
-            75, MechanumDrivetrain::travelDirection::west, 25);
+            75, travelDirection::west, 25);
       } else if (obj.centerY < 320 - centreTolorance) {
         moved = true;
         // move right
         mechanumDrivetrain.DriveFor(
             75,
-            GetDirection(MechanumDrivetrain::travelDirection::east, currentArm),
+            GetDirection(travelDirection::east, currentArm),
             25);
       }
 
@@ -94,13 +89,13 @@ void PickupTower(TowerColour towerColour) {
         moved = true;
         // Too close
         mechanumDrivetrain.DriveFor(
-            75, MechanumDrivetrain::travelDirection::south, 25);
+            75, travelDirection::south, 25);
       } else if (obj.width < targetWidth - sizeTolorance &&
                  obj.height < targetHeight - sizeTolorance) {
         moved = true;
         // Too far
         mechanumDrivetrain.DriveFor(
-            75, MechanumDrivetrain::travelDirection::north, 25);
+            75, travelDirection::north, 25);
       }
 
       if (!moved)
@@ -111,7 +106,7 @@ void PickupTower(TowerColour towerColour) {
     // Lower arms
     MotorTightener.spinFor(directionType::fwd, 60, rotationUnits::deg);
     // Move forward specified distance so that arms are under tower
-    mechanumDrivetrain.DriveFor(300, MechanumDrivetrain::travelDirection::north,
+    mechanumDrivetrain.DriveFor(300, travelDirection::north,
                                 25);
     // lift arms
   } else
@@ -122,30 +117,30 @@ void LeftAuton() {
   // Roughly position infront of goal
 
   // Push goal up onto balance platfrom whilst deccellerating
-  mechanumDrivetrain.DriveFor(300, MechanumDrivetrain::travelDirection::north,
+  mechanumDrivetrain.DriveFor(300, travelDirection::north,
                               50);
-  mechanumDrivetrain.DriveFor(300, MechanumDrivetrain::travelDirection::north,
+  mechanumDrivetrain.DriveFor(300, travelDirection::north,
                               25);
-  mechanumDrivetrain.DriveFor(300, MechanumDrivetrain::travelDirection::north,
+  mechanumDrivetrain.DriveFor(300, travelDirection::north,
                               12);
-  mechanumDrivetrain.DriveFor(300, MechanumDrivetrain::travelDirection::north,
+  mechanumDrivetrain.DriveFor(300, travelDirection::north,
                               6);
 }
 
 void RightAuton() {
   // Position so forward is yellow goal
 
-  mechanumDrivetrain.DriveFor(1500, MechanumDrivetrain::travelDirection::north,
+  mechanumDrivetrain.DriveFor(1500, travelDirection::north,
                               75);
-  PickupTower(TowerColour::yellow);
-  mechanumDrivetrain.DriveFor(1200, MechanumDrivetrain::travelDirection::west,
+  PickupTower("Yellow");
+  mechanumDrivetrain.DriveFor(1200, travelDirection::west,
                               75);
   mechanumDrivetrain.TurnFor(90, MechanumDrivetrain::turnDirection::right, 50);
   SelectArm(west, true);
-  PickupTower(TowerColour::yellow);
-  mechanumDrivetrain.DriveFor(600, MechanumDrivetrain::travelDirection::north,
+  PickupTower("Yellow");
+  mechanumDrivetrain.DriveFor(600, travelDirection::north,
                               75);
-  mechanumDrivetrain.DriveFor(1200, MechanumDrivetrain::travelDirection::east,
+  mechanumDrivetrain.DriveFor(1200, travelDirection::east,
                               75);
   MotorTightener.spinFor(directionType::fwd, 60, rotationUnits::deg);
   SelectArm(north, true);
@@ -156,13 +151,13 @@ void LeftAutonWP() {
   // Roughly position infront of goal
 
   // Push goal up onto balance platfrom whilst deccellerating
-  mechanumDrivetrain.DriveFor(300, MechanumDrivetrain::travelDirection::north,
+  mechanumDrivetrain.DriveFor(300, travelDirection::north,
                               50);
-  mechanumDrivetrain.DriveFor(300, MechanumDrivetrain::travelDirection::north,
+  mechanumDrivetrain.DriveFor(300, travelDirection::north,
                               25);
-  mechanumDrivetrain.DriveFor(300, MechanumDrivetrain::travelDirection::north,
+  mechanumDrivetrain.DriveFor(300, travelDirection::north,
                               12);
-  mechanumDrivetrain.DriveFor(300, MechanumDrivetrain::travelDirection::north,
+  mechanumDrivetrain.DriveFor(300, travelDirection::north,
                               6);
 }
 
@@ -170,36 +165,35 @@ void RightAutonWP() {
   // Roughly position bot infront of goal
 
   // Drive towards goal
-  mechanumDrivetrain.DriveFor(600, MechanumDrivetrain::travelDirection::north,
+  mechanumDrivetrain.DriveFor(600, travelDirection::north,
                               50);
   // centre on and pickup team tower
-  PickupTower(selectedTeam);
+  PickupTower(results[1]);
   // Reverse from line
-  mechanumDrivetrain.DriveFor(300, MechanumDrivetrain::travelDirection::south,
+  mechanumDrivetrain.DriveFor(300, travelDirection::south,
                               50);
   // Drop tower
   MotorTightener.spinFor(directionType::fwd, 60, rotationUnits::deg);
 }
 
-bool wp = false;
-
 void pre_auton(void) {
   vexcodeInit();
   mechanumDrivetrain.acceleration = 10;
   mechanumDrivetrain.maxSpeed = 50;
-  selectedSide = InitAutonSelect();
-  selectedTeam = InitTeamSelect();
-  wp = InitAutonWinPoint();
+  Initialize();
+  for (int i = 0; i < results.size(); i++) {
+    std::cout << results[i] << std::endl;
+  }
 }
 
 void autonomous(void) {
-  if (selectedSide == side::left) {
-    if (wp)
+  if (results[0] == "Left") {
+    if (results[2] == "Win Point")
       LeftAutonWP();
     else
       LeftAuton();
-  } else if (selectedSide == side::right) {
-    if (wp)
+  } else if (results[0] == "Right") {
+    if (results[2] == "Win Point")
       RightAutonWP();
     else
       RightAuton();
@@ -210,7 +204,7 @@ bool canDrive = true;
 
 void usercontrol(void) {
   while (1) {
-    mechanumDrivetrain.ManualControl();
+    mechanumDrivetrain.ManualControl(currentArm);
     if (canSelect) {
       if (Controller1.ButtonUp.pressing())
         SelectArm(ArmDirections::north);
